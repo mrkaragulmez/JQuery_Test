@@ -1,0 +1,39 @@
+﻿
+@{
+    ViewBag.Title = "YeniUrun";
+}
+
+<h2>YeniUrun</h2>
+
+<div id="addproduct">
+
+</div>
+<script>
+    $(document).ready(function () {
+        setTimeout(() => {
+            var jsonformat;
+            $.get("/Home/GetData", function (data) {
+                jsonformat = JSON.parse(data)
+                AddProc()
+            })
+
+            function AddProc() {
+                var main = $("#addproduct");
+                var mainform = $(main).append($("<table>", { id: jsonformat.product.table.id, style:"width:20%" }).addClass("table table-responsive"))
+                $("#" + jsonformat.product.table.id).append('<tbody>')
+
+                var prodarray = jsonformat.product.table.columns[0].prodlist
+
+                prodarray.forEach(function (item, index) {
+                    if (index != 0) {
+                        $("#" + jsonformat.product.table.id + " tbody").append($("<tr/>").append($("<td/>", { text: item.text })))
+                    }
+                })
+
+                //main.append($('<form/>').append($('input')))
+            }
+        }, 150)
+    })
+
+
+</script>

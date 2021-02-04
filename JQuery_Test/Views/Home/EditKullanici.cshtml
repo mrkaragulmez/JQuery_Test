@@ -1,0 +1,112 @@
+﻿@*@model JQuery_Test.Models.Users
+    @{
+        ViewBag.Title = "EditKullanici";
+        IEnumerable<ModelMetadata> modelcolumn = ViewData.ModelMetadata.Properties;
+        List<string> jsoncolumn = new List<string>();
+        foreach (var item in modelcolumn)
+        {
+            jsoncolumn.Add(item.PropertyName);
+        }
+    }*@
+
+
+@*<h2>Kullanıcı : @Model._name (ID: @Model.ID)</h2>*@
+
+
+<div id="area" class="edituser container">
+
+</div>
+<div id="urunler" style="margin-top:2em">
+
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var jsonFormat;
+        setTimeout(() => {
+            $.ajax({
+                url: '/Home/GetData',
+                type: "GET",
+                success: function (result) {
+                    jsonFormat = JSON.parse(result);
+                    DataPool()
+                }
+            });
+
+            function CreateRow() {
+                $('#' + jsonFormat.product.table.id).append($('<tr>').append($('<td>', { class: "col-md-1 col-sm-1 col-lg-1 col-xs-1" }).append($('<img>', { src: "https://localhost:44391/Content/cancel.png", id: "removeprod" }).click(function () { $(this).parent().parent().remove() }))))
+
+                $.each(jsonFormat.product.table.columns, function (index, item) {
+                    if (item.type == "combo") {
+                        $('#' + jsonFormat.product.table.id + " tr").last().append($('<td>', { class: "col-md-t col-sm-t col-lg-t col-xs-t".replaceAll("t", item.columngrid) }).append($('<select>', { name: item.name })))
+                        $.each(item.prodlist, function (index, item) {
+                            if (index == 0) {
+                                $('#' + jsonFormat.product.table.id + " select").last().append($('<option>', { text: item.text, value: item.value }).attr("disabled", true).attr("selected", true))
+                            }
+                            else {
+                                $('#' + jsonFormat.product.table.id + " select").last().append($('<option>', { text: item.text, value: item.value }))
+                            }
+                        })
+                    }
+                    else if (item.type == "textarea") {
+                        $('#' + jsonFormat.product.table.id + " tr").last().append($('<td>', { class: "col-md-t col-sm-t col-lg-t col-xs-t".replaceAll("t", item.columngrid) }).append($('<textarea>', { placeholder: item.text, name: item.name })))
+                    }
+                    else {
+                        $('#' + jsonFormat.product.table.id + " tr").last().append($('<td>', { class: "col-md-t col-sm-t col-lg-t col-xs-t".replaceAll("t", item.columngrid) }).append($('<input>', { type: item.type, placeholder: item.text, name: item.name })))
+                    }
+                })
+            }
+
+            function FillRow() {
+                // data doldur
+            }
+
+            function DataPool() {
+
+                var urlPieces = window.location.href.split('/');
+                var userId = urlPieces[urlPieces.length - 1];
+                setTimeout(() => {
+
+                    $.get("/Home/EditKullaniciJSON", { id: userId }, function (data, response) {
+                        if (response) {
+                            var keys = Object.keys(data);
+                            var urunlistesi = data.Product;
+                            if (data.Product != null) {
+                                for (var i = 0; i < urunlistesi.length; i++) {
+                                    CreateRow()
+                                }
+
+                                var productKeys;
+                                for (var i = 1; i < urunlistesi.length + 1; i++) {
+
+                                    productKeys = Object.keys(urunlistesi[i - 1])
+                                    productKeys.forEach(function (key, index2) {
+                                        if ($('[name ="' + key + '"]').length > 0) {
+                                            $($('[name ="' + key + '"]')[i - 1]).val(urunlistesi[i - 1][key])
+                                        }
+                                    })
+                                }
+                            }
+                            keys.forEach(function (key, index) {
+                                if ($('[name ="' + key + '"]').length > 0) {
+                                    $('[name ="' + key + '"]').val(data[key])
+                                    $.each($._data($('[name ="' + key + '"]')[0], "events"), function (i, event) {
+                                        $.each(event, function (j, h) {
+                                            $('[name ="' + key + '"]').trigger(h.type)
+                                        });
+                                    });
+                                    if (data[key] == "True" || data[key] == "False") {
+                                        $('[name ="' + key + '"]').prop("checked", data[key] == "False" ? false : true)
+                                    }
+                                }
+                            })
+                        }
+                    })
+                }, 100)
+            }
+
+        }, 50)
+    })
+
+
+
+</script>

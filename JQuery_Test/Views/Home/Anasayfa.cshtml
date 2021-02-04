@@ -1,0 +1,59 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<h2>Kullanıcı Sırala</h2>
+<div id="fordrag" class="container">
+    <div class="container" style="padding:2em">
+        <div class="container" id="list"></div>
+    </div>
+    <div class="" id="progressbar"></div>
+
+    <div id="trash">
+        <h3>Trash</h3>
+        <table>
+
+            <tr></tr>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    setTimeout(() => {
+        $(document).ready(function () {
+            $("#list tbody tr, #trash tr").addClass("connect").sortable({ connectWith: "connect" }).disableSelection();
+            $("#list").draggable({ /*containment: "#fordrag"*/ })
+            $("#fordrag").droppable({
+                drop: function (event, ui) {
+                    //$(this).append($("<p>", { text: "dropped" }))
+                }
+            })
+
+            $(function () {
+                $("#progressbar").progressbar({ value: 99 })
+            })
+        })
+
+
+        let req1 = new Promise(function (resolve, reject) {
+            setTimeout(function () {
+                resolve('First!');
+            }, 1000);
+        });
+        let req2 = new Promise(function (resolve, reject) {
+            setTimeout(function () {
+                reject('Second!');
+            }, 2000);
+        });
+
+        Promise.all([req1, req2]).then(function (results) {
+            console.log('Then: ', results);
+        }).catch(function (err) {
+            console.log('Catch: ', err);
+        });
+    }, 160)
+</script>
